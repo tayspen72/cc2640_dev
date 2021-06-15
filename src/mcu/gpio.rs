@@ -142,12 +142,60 @@ pub fn get_pin_state(pin: u8) -> PinState {
 	}
 }
 
-// #[allow(dead_code)]
-// pub fn pin_disable(_config: &PinConfig) {
-// 	unsafe { if !INITIALIZED {
-// 		return;
-// 	}}
-// }
+#[allow(dead_code)]
+pub fn pin_disable(config: &PinConfig) {
+	unsafe { if !INITIALIZED {
+		return;
+	}}
+
+	// Disable input
+	free(|cs| {
+		if let Some(ioc) = IOC_HANDLE.borrow(cs).borrow_mut().deref_mut()	{
+			match config.pin {
+				0 => ioc.iocfg0.write(|w| w.ie().clear_bit() ),
+				1 => ioc.iocfg1.write(|w| w.ie().clear_bit() ),
+				2 => ioc.iocfg2.write(|w| w.ie().clear_bit() ),
+				3 => ioc.iocfg3.write(|w| w.ie().clear_bit() ),
+				4 => ioc.iocfg4.write(|w| w.ie().clear_bit() ),
+				5 => ioc.iocfg5.write(|w| w.ie().clear_bit() ),
+				6 => ioc.iocfg6.write(|w| w.ie().clear_bit() ),
+				7 => ioc.iocfg7.write(|w| w.ie().clear_bit() ),
+				8 => ioc.iocfg8.write(|w| w.ie().clear_bit() ),
+				9 => ioc.iocfg9.write(|w| w.ie().clear_bit() ),
+				10 => ioc.iocfg10.write(|w| w.ie().clear_bit() ),
+				11 => ioc.iocfg11.write(|w| w.ie().clear_bit() ),
+				12 => ioc.iocfg12.write(|w| w.ie().clear_bit() ),
+				13 => ioc.iocfg13.write(|w| w.ie().clear_bit() ),
+				14 => ioc.iocfg14.write(|w| w.ie().clear_bit() ),
+				15 => ioc.iocfg15.write(|w| w.ie().clear_bit() ),
+				16 => ioc.iocfg16.write(|w| w.ie().clear_bit() ),
+				17 => ioc.iocfg17.write(|w| w.ie().clear_bit() ),
+				18 => ioc.iocfg18.write(|w| w.ie().clear_bit() ),
+				19 => ioc.iocfg19.write(|w| w.ie().clear_bit() ),
+				20 => ioc.iocfg20.write(|w| w.ie().clear_bit() ),
+				21 => ioc.iocfg21.write(|w| w.ie().clear_bit() ),
+				22 => ioc.iocfg22.write(|w| w.ie().clear_bit() ),
+				23 => ioc.iocfg23.write(|w| w.ie().clear_bit() ),
+				24 => ioc.iocfg24.write(|w| w.ie().clear_bit() ),
+				25 => ioc.iocfg25.write(|w| w.ie().clear_bit() ),
+				26 => ioc.iocfg26.write(|w| w.ie().clear_bit() ),
+				27 => ioc.iocfg27.write(|w| w.ie().clear_bit() ),
+				28 => ioc.iocfg28.write(|w| w.ie().clear_bit() ),
+				29 => ioc.iocfg29.write(|w| w.ie().clear_bit() ),
+				30 => ioc.iocfg30.write(|w| w.ie().clear_bit() ),
+				31 => ioc.iocfg31.write(|w| w.ie().clear_bit() ),
+				_ => (),
+			}
+		}
+	});
+
+	// Disable output
+	free(|cs| {
+		if let Some(gpio) = GPIO_HANDLE.borrow(cs).borrow_mut().deref_mut()	{
+			gpio.doe31_0.modify(|r, w| unsafe { w.bits(r.bits() & !(1 << config.pin)) });
+		}
+	});
+}
 
 #[allow(dead_code)]
 pub fn pin_setup(config: &PinConfig){
@@ -404,7 +452,37 @@ pub fn set_pin_port_id(pin: u8, id: PortId){
 		if let Some(ref mut ioc) = IOC_HANDLE.borrow(cs).borrow_mut().deref_mut() {
 			match pin {
 				0 => ioc.iocfg0.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
-				// TODO: Finish this copy paste
+				1 => ioc.iocfg1.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				2 => ioc.iocfg2.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				3 => ioc.iocfg3.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				4 => ioc.iocfg4.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				5 => ioc.iocfg5.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				6 => ioc.iocfg6.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				7 => ioc.iocfg7.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				8 => ioc.iocfg8.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				9 => ioc.iocfg9.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				10 => ioc.iocfg10.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				11 => ioc.iocfg11.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				12 => ioc.iocfg12.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				13 => ioc.iocfg13.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				14 => ioc.iocfg14.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				15 => ioc.iocfg15.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				16 => ioc.iocfg16.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				17 => ioc.iocfg17.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				18 => ioc.iocfg18.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				19 => ioc.iocfg19.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				20 => ioc.iocfg20.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				21 => ioc.iocfg21.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				22 => ioc.iocfg22.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				23 => ioc.iocfg23.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				24 => ioc.iocfg24.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				25 => ioc.iocfg25.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				26 => ioc.iocfg26.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				27 => ioc.iocfg27.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				28 => ioc.iocfg28.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				29 => ioc.iocfg29.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				30 => ioc.iocfg30.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
+				31 => ioc.iocfg31.modify(|_, w| unsafe { w.port_id().bits(id as u8) }),
 				_ => (),
 			}
 		}
