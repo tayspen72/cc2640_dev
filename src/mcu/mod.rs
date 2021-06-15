@@ -9,6 +9,8 @@
 use cortex_m;
 use cc2640r2f;
 
+pub mod gpio;
+
 //==============================================================================
 // Enums, Structs, and Types
 //==============================================================================
@@ -55,16 +57,9 @@ pub fn init() {
 	
 	// systick::init(cortex_peripherals.SYST);
 
-	// Disable the watchdog (indefinitely, for now)
-	// peripherals.WDT_A.wdtctl.write(|w| unsafe { w
-	// 	.wdtpw().bits(0x5A)
-	// 	.wdthold().wdthold_1()
-	// 	.wdtis().wdtis_0()
-	// });
-
 	// init_clock(peripherals.CS);
 	
-	// gpio::init(peripherals.DIO);
+	gpio::init(peripherals.GPIO, peripherals.IOC);
 }
 
 // #[allow(dead_code)]
@@ -80,11 +75,7 @@ pub fn restart() {
 //==============================================================================
 // Private Functions
 //==============================================================================
-// fn init_clock(clock: msp432p401r::CS) {
-// 	clock.cskey.write(|w| unsafe { w.cskey().bits(0x695A) });
 
-
-// }
 
 //==============================================================================
 // Task Handler
