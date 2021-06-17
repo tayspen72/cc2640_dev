@@ -1,22 +1,14 @@
 //==============================================================================
 // Notes
 //==============================================================================
-// main.rs
+// drivers::button.rs
 
 //==============================================================================
 // Crates and Mods
 //==============================================================================
-#![no_std]
-#![no_main]
-
-use cortex_m_rt::entry;
-use cortex_m_semihosting::hprintln;
-// use panic_halt as _; // Breakpoint on `rust_begin_unwind` to catch panics
-use panic_semihosting as _;
-
-mod config;
-mod drivers;
-mod mcu;
+use crate::config;
+use crate::mcu::gpio;
+use super::led;
 
 //==============================================================================
 // Enums, Structs, and Types
@@ -26,33 +18,54 @@ mod mcu;
 //==============================================================================
 // Variables
 //==============================================================================
+const PRESSED_STATE: gpio::PinState = gpio::PinState::PinLow;
+const PUSH_BUTTON: gpio::PinConfig = gpio::PinConfig {
+	pin: config::PUSH_BUTTON_PIN,
+	direction: gpio::PinDirection::Input,
+	pull: gpio::PinPull::PullUp,
+	state: gpio::PinState::PinHigh
+};
 
+static mut INITIALIZED: bool = false;
 
 //==============================================================================
-// Main
+// Public Functions
 //==============================================================================
-#[entry]
-fn main() -> ! {
-	hprintln!("Launching CC2640R2F!").unwrap();
-	init();
-	
-	loop {
-		task_handler();
+#[allow(dead_code)]
+pub fn init(){
+	gpio::pin_setup(&PUSH_BUTTON);
+
+	unsafe { INITIALIZED = true };
+}
+
+#[allow(dead_code)]
+pub fn get_button_state() -> bool {
+	if gpio::get_pin_state(PUSH_BUTTON.pin) == PRESSED_STATE {
+		true
+	}
+	else {
+		false
 	}
 }
 
 //==============================================================================
 // Private Functions
 //==============================================================================
-fn init() {
-	mcu::init();
-	drivers::init();
-}
+
+
+//==============================================================================
+// Interrupt Handler
+//==============================================================================
+
 
 //==============================================================================
 // Task Handler
 //==============================================================================
-fn task_handler() {
-	mcu::task_handler();
-	drivers::task_handler();
+pub fn task_handler() {
+	if get_button_state() {
+		led::set_led_state(0, true);
+	}
+	else {
+		led::set_led_state(0, false);
+	}
 }

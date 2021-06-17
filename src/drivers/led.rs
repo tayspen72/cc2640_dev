@@ -1,22 +1,13 @@
 //==============================================================================
 // Notes
 //==============================================================================
-// main.rs
+// drivers::led.rs
 
 //==============================================================================
 // Crates and Mods
 //==============================================================================
-#![no_std]
-#![no_main]
-
-use cortex_m_rt::entry;
-use cortex_m_semihosting::hprintln;
-// use panic_halt as _; // Breakpoint on `rust_begin_unwind` to catch panics
-use panic_semihosting as _;
-
-mod config;
-mod drivers;
-mod mcu;
+use crate::config;
+use crate::mcu::gpio;
 
 //==============================================================================
 // Enums, Structs, and Types
@@ -26,33 +17,67 @@ mod mcu;
 //==============================================================================
 // Variables
 //==============================================================================
-
-
-//==============================================================================
-// Main
-//==============================================================================
-#[entry]
-fn main() -> ! {
-	hprintln!("Launching CC2640R2F!").unwrap();
-	init();
-	
-	loop {
-		task_handler();
+const LED_OFF_STATE: gpio::PinState = gpio::PinState::PinLow;
+const LED_ON_STATE: gpio::PinState = gpio::PinState::PinHigh;
+const LEDS_COUNT: usize = 2;
+const LEDS: [gpio::PinConfig; 2] = [
+	gpio::PinConfig {
+		pin: config::LED_1_PIN,
+		direction: gpio::PinDirection::Output,
+		pull: gpio::PinPull::PullDisabled,
+		state: gpio::PinState::PinLow
+	},
+	gpio::PinConfig {
+		pin: config::LED_2_PIN,
+		direction: gpio::PinDirection::Output,
+		pull: gpio::PinPull::PullDisabled,
+		state: gpio::PinState::PinLow
 	}
+];
+
+static mut INITIALIZED: bool = false;
+
+//==============================================================================
+// Public Functions
+//==============================================================================
+#[allow(dead_code)]
+pub fn init(){
+	for led in LEDS.iter() {
+		gpio::pin_setup(&led);
+	}
+
+	unsafe { INITIALIZED = true };
+}
+
+#[allow(dead_code)]
+pub fn set_led_state(led: usize, state: bool) {
+	if led >= LEDS_COUNT {
+		return;
+	}
+
+	let pin_state: gpio::PinState = if state {
+		LED_ON_STATE
+	}
+	else {
+		LED_OFF_STATE
+	};
+
+	gpio::set_pin_state(LEDS[led].pin, pin_state);
 }
 
 //==============================================================================
 // Private Functions
 //==============================================================================
-fn init() {
-	mcu::init();
-	drivers::init();
-}
+
+
+//==============================================================================
+// Interrupt Handler
+//==============================================================================
+
 
 //==============================================================================
 // Task Handler
 //==============================================================================
-fn task_handler() {
-	mcu::task_handler();
-	drivers::task_handler();
+pub fn task_handler() {
+
 }

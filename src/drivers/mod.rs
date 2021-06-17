@@ -1,22 +1,13 @@
 //==============================================================================
 // Notes
 //==============================================================================
-// main.rs
+// drivers::mod.rs
 
 //==============================================================================
 // Crates and Mods
 //==============================================================================
-#![no_std]
-#![no_main]
-
-use cortex_m_rt::entry;
-use cortex_m_semihosting::hprintln;
-// use panic_halt as _; // Breakpoint on `rust_begin_unwind` to catch panics
-use panic_semihosting as _;
-
-mod config;
-mod drivers;
-mod mcu;
+pub mod button;
+pub mod led;
 
 //==============================================================================
 // Enums, Structs, and Types
@@ -29,30 +20,22 @@ mod mcu;
 
 
 //==============================================================================
-// Main
+// Public Functions
 //==============================================================================
-#[entry]
-fn main() -> ! {
-	hprintln!("Launching CC2640R2F!").unwrap();
-	init();
-	
-	loop {
-		task_handler();
-	}
+pub fn init() {
+	button::init();
+	led::init();
 }
 
 //==============================================================================
 // Private Functions
 //==============================================================================
-fn init() {
-	mcu::init();
-	drivers::init();
-}
+
 
 //==============================================================================
 // Task Handler
 //==============================================================================
-fn task_handler() {
-	mcu::task_handler();
-	drivers::task_handler();
+pub fn task_handler() {
+	button::task_handler();
+	led::task_handler();
 }
